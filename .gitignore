@@ -1,0 +1,16 @@
+node_modules/
+.angular/
+.playwright-mcp/
+playwright-report/
+test-results/
+.idea/
+www/
+dist/
+coverage/
+*-redesign.png
+.env
+.env.*
+!.env.example
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

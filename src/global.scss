@@ -1,0 +1,652 @@
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/flex-utils.css';
+
+body {
+  background: var(--ion-background-color);
+}
+
+.app-header ion-toolbar {
+  --background: var(--ion-background-color);
+  --border-width: 0;
+  --min-height: 58px;
+  color: var(--ion-text-color);
+  font-weight: 800;
+}
+
+.app-header ion-title {
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.app-page {
+  --background: var(--ion-background-color);
+  --padding-bottom: 88px;
+}
+
+.screen-shell {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 16px 14px 104px;
+}
+
+.calculator-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 5px;
+  margin-bottom: 22px;
+  border-radius: 10px;
+  background: #e9edf2;
+}
+
+.calculator-tabs a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #374151;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.calculator-tabs a.is-active {
+  color: #111827;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.calculator-card,
+.info-card,
+.history-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.calculator-card {
+  padding: 24px 22px;
+}
+
+.card-heading {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.card-heading h1,
+.brand-block h1,
+.info-card h2,
+.history-card h2 {
+  margin: 0;
+  color: #111827;
+  letter-spacing: 0;
+}
+
+.card-heading h1 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.card-heading p,
+.brand-block p,
+.history-meta,
+.history-dose,
+.info-card p,
+.info-card li {
+  color: #4b5563;
+  line-height: 1.45;
+}
+
+.card-heading p {
+  margin: 3px 0 0;
+  font-size: 13px;
+}
+
+.heading-icon,
+.brand-mark {
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background: #0f766e;
+}
+
+.heading-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  margin-top: 3px;
+}
+
+.heading-icon.violet {
+  background: #7c3aed;
+}
+
+.link-button,
+.delete-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.link-button {
+  padding: 4px 0;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.violet-text {
+  color: #7c3aed;
+}
+
+.calculation-form {
+  display: grid;
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+.calculation-form ion-item,
+.search-shell {
+  --background: #f8fafc;
+  --border-color: #d1d5db;
+  --border-radius: 10px;
+  --border-style: solid;
+  --border-width: 1px;
+  --inner-border-width: 0;
+  --padding-start: 15px;
+  --padding-end: 14px;
+  --inner-padding-end: 8px;
+  --min-height: 62px;
+  border-radius: 12px;
+}
+
+.inline-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(116px, 140px);
+  gap: 10px;
+  align-items: end;
+}
+
+.unit-pill {
+  --background: #f8fafc;
+  --color: #111827;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --inner-padding-end: 0;
+  font-weight: 800;
+}
+
+.calculation-form ion-input,
+.calculation-form ion-select {
+  --color: #111827;
+  --placeholder-color: #6b7280;
+  width: 100%;
+  min-height: 52px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.calculation-form ion-input::part(label),
+.calculation-form ion-select::part(label) {
+  margin-bottom: 6px;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.calculation-form ion-input::part(native) {
+  min-height: 28px;
+  padding-top: 4px;
+  color: #111827;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.calculation-form ion-select::part(text),
+.calculation-form ion-select::part(placeholder) {
+  color: #111827;
+  opacity: 1;
+  font-size: 15px;
+  font-weight: 800;
+  white-space: normal;
+}
+
+.calculation-form ion-select::part(icon) {
+  color: #4b5563;
+  opacity: 1;
+}
+
+.unit-pill ion-select {
+  --color: #111827;
+  --placeholder-color: #111827;
+  min-height: 48px;
+  min-width: 0;
+  text-align: center;
+  color: #111827;
+}
+
+.unit-pill ion-select::part(text),
+.unit-pill ion-select::part(placeholder),
+.unit-pill ion-select::part(icon) {
+  color: #111827;
+  opacity: 1;
+}
+
+ion-popover ion-select-popover ion-item {
+  --background: #ffffff;
+  --color: #111827;
+  color: #111827;
+}
+
+ion-popover ion-select-popover ion-item.item-radio-checked {
+  --background: #bfdbfe;
+  --color: #111827;
+  color: #111827;
+}
+
+ion-popover ion-select-popover ion-label {
+  color: #111827;
+}
+
+.field-block {
+  display: grid;
+  gap: 7px;
+}
+
+.field-label,
+.result-kicker,
+.step-results h2,
+.history-section-title {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.segmented-list {
+  overflow: hidden;
+  display: grid;
+  border-radius: 11px;
+  background: #eef2f6;
+}
+
+.segmented-list button {
+  min-height: 47px;
+  border: 0;
+  color: #4b5563;
+  background: transparent;
+  font-weight: 700;
+}
+
+.segmented-list button.is-active {
+  color: #ffffff;
+  background: #087a3d;
+}
+
+.empty-result {
+  display: grid;
+  place-items: center;
+  min-height: 130px;
+  padding: 22px;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 12px;
+  color: #6b7280;
+  text-align: center;
+  background: #f8fafc;
+}
+
+.empty-result ion-icon {
+  margin-bottom: 8px;
+  font-size: 28px;
+}
+
+.result-panel,
+.step-card,
+.volume-card,
+.follow-card {
+  border-radius: 12px;
+}
+
+.result-panel {
+  display: grid;
+  gap: 11px;
+  padding: 16px;
+  border-left: 4px solid #22c55e;
+  background: #ecfdf5;
+}
+
+.metric-row,
+.step-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.metric-row strong,
+.step-card strong,
+.history-metrics strong {
+  color: #111827;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.instruction {
+  margin: 0;
+  color: #065f46;
+  font-weight: 700;
+}
+
+.step-results {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.step-card {
+  min-height: 74px;
+  padding: 16px;
+  border-left: 4px solid currentColor;
+}
+
+.step-card span {
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.step-card small {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.step-card.blue {
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.step-card.green {
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.step-card.amber {
+  color: #d97706;
+  background: #fffbeb;
+}
+
+.step-card.purple {
+  color: #7c3aed;
+  background: #faf5ff;
+}
+
+.volume-card {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 16px;
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.warning-title {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.volume-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.volume-grid div {
+  display: grid;
+  gap: 3px;
+  padding: 10px 6px;
+  border-radius: 8px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.volume-grid span,
+.volume-grid small,
+.history-metrics span {
+  color: #6b7280;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.follow-card {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+  padding: 16px;
+  color: #831843;
+  background: #fdf2f8;
+}
+
+.home-actions {
+  display: grid;
+  gap: 12px;
+}
+
+.action-tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 62px;
+  padding: 14px;
+  border-radius: 14px;
+  color: #111827;
+  background: #f8fafc;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.action-tile.primary {
+  color: #ffffff;
+  background: #087a3d;
+}
+
+.search-shell {
+  margin-bottom: 18px;
+  background: #eef2f6;
+}
+
+.history-list {
+  display: grid;
+  gap: 14px;
+}
+
+.history-card {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+}
+
+.history-card h2 {
+  max-width: calc(100% - 32px);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.delete-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  color: #b91c1c;
+  font-size: 18px;
+}
+
+.history-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.history-metrics div {
+  display: grid;
+  gap: 5px;
+  padding: 13px;
+  border-radius: 9px;
+  background: #f8fafc;
+}
+
+.history-metrics .green {
+  background: #dcfce7;
+}
+
+.reuse-button {
+  justify-self: end;
+  padding: 10px 18px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #020617;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.history-empty {
+  margin-top: 40px;
+}
+
+.brand-block {
+  display: grid;
+  place-items: center;
+  margin: 10px 0 20px;
+  text-align: center;
+}
+
+.brand-mark {
+  width: 56px;
+  height: 56px;
+  margin-bottom: 10px;
+  border-radius: 13px;
+  background: #111827;
+  font-size: 28px;
+}
+
+.brand-block h1 {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.brand-block p {
+  margin: 3px 0 0;
+  font-size: 12px;
+}
+
+.info-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.info-card.danger {
+  color: #7f1d1d;
+  background: #fee2e2;
+}
+
+.info-heading {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.info-heading h2 {
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.info-card ul {
+  display: grid;
+  gap: 10px;
+  padding-left: 18px;
+  margin: 0;
+}
+
+.bottom-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: min(100%, 430px);
+  margin: 0 auto;
+  padding: 10px 22px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid #e5e7eb;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+}
+
+.bottom-nav a {
+  display: grid;
+  place-items: center;
+  gap: 3px;
+  min-height: 48px;
+  border-radius: 999px;
+  color: #111827;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.bottom-nav ion-icon {
+  font-size: 20px;
+}
+
+.bottom-nav a.is-active {
+  color: #064e3b;
+  background: #4ade80;
+}
+
+@media (min-width: 768px) {
+  .screen-shell {
+    padding-top: 22px;
+  }
+}
+
+@media (max-width: 380px) {
+  .screen-shell {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  .calculator-card {
+    padding: 20px 16px;
+  }
+
+  .inline-field {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator-tabs a {
+    font-size: 11px;
+  }
+
+  .volume-grid {
+    grid-template-columns: 1fr;
+  }
+}

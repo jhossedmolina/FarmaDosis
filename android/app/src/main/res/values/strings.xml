@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">FarmaDosis</string>
+    <string name="title_activity_main">FarmaDosis</string>
+    <string name="package_name">co.edu.poligran.farmadosis</string>
+    <string name="custom_url_scheme">co.edu.poligran.farmadosis</string>
+</resources>
