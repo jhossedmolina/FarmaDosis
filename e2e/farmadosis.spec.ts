@@ -84,7 +84,7 @@ test.describe('FarmaDosis functional flows', () => {
     await fillIonInput(page, 'cri-weight', '10');
     await fillIonInput(page, 'cri-dose-rate', '5');
     await fillIonInput(page, 'cri-bag-volume', '100');
-    await fillIonInput(page, 'cri-infusion-rate', '10');
+    await fillIonInput(page, 'cri-bag-duration', '10');
     await fillIonInput(page, 'cri-vial-concentration', '40');
     await fillIonInput(page, 'cri-bag-count', '2');
 
@@ -109,7 +109,7 @@ test.describe('FarmaDosis functional flows', () => {
     await fillIonInput(page, 'cri-weight', '10');
     await fillIonInput(page, 'cri-dose-rate', '5');
     await fillIonInput(page, 'cri-bag-volume', '100');
-    await fillIonInput(page, 'cri-infusion-rate', '10');
+    await fillIonInput(page, 'cri-bag-duration', '10');
     await fillIonInput(page, 'cri-vial-concentration', '40');
     await fillIonInput(page, 'cri-bag-count', '2');
     await page.locator('app-cri-calculator-page').getByTestId('save-cri').click();

@@ -47,14 +47,14 @@ import { HistoryStoreService } from '../services/history-store.service';
                   </div>
                 </div>
                 <p class="history-dose">{{ entry.instruction }}</p>
-                <a class="reuse-button" [routerLink]="entry.kind === 'dose' ? '/dose' : '/cri'">Reutilizar</a>
+                <a class="reuse-button" [routerLink]="entry.kind === 'dose' ? '/dose' : '/cri'" [queryParams]="{ reuse: entry.id }">Reutilizar</a>
               </article>
             }
           </div>
         } @else {
           <section class="empty-result history-empty">
             <ion-icon name="time-outline" aria-hidden="true" />
-            <p>No hay calculos guardados durante esta sesion.</p>
+            <p>No hay calculos guardados.</p>
           </section>
         }
       </section>

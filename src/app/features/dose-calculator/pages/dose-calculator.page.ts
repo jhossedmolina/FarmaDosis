@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
@@ -17,7 +18,7 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 
-import { calculateDose } from '../../../domain/dose/dose-calculator';
+import { calculateDose, validateDoseInput } from '../../../domain/dose/dose-calculator';
 import { DoseConcentrationUnit, DoseInput } from '../../../domain/dose/dose.models';
 import { BottomNavComponent } from '../../../shared/components/bottom-nav.component';
 import { CalculatorTabsComponent } from '../../../shared/components/calculator-tabs.component';
@@ -73,6 +74,7 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
             <ion-item>
               <ion-input data-testid="dose-weight" label="Peso del paciente (kg)" labelPlacement="stacked" type="number" inputmode="decimal" placeholder="Ej: 12.5" formControlName="patientWeightKg" />
             </ion-item>
+            @if (fieldError('patientWeightKg'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
 
             <div class="inline-field">
               <ion-item>
@@ -85,6 +87,7 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
                 </ion-select>
               </ion-item>
             </div>
+            @if (fieldError('dosePerKg'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
 
             <div class="field-block">
               <span class="field-label">Presentacion del medicamento</span>
@@ -105,6 +108,7 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
               <ion-item>
                 <ion-input data-testid="dose-concentration" label="Concentracion" labelPlacement="stacked" type="number" inputmode="decimal" formControlName="concentration" />
               </ion-item>
+              @if (fieldError('concentration'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
               <ion-item>
                 <ion-select label="Unidad concentracion" labelPlacement="stacked" justify="space-between" interface="popover" formControlName="concentrationUnit">
                   @if (form.controls.presentation.value === 'solution') {
@@ -115,6 +119,7 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
                   }
                 </ion-select>
               </ion-item>
+              @if (fieldError('concentrationUnit'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
             }
           </form>
 
@@ -153,6 +158,9 @@ export class DoseCalculatorPage {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly history = inject(HistoryStoreService);
   private readonly toastController = inject(ToastController);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly submitted = signal(false);
 
   readonly form = this.fb.group({
     patientWeightKg: this.fb.control<number>(0, [Validators.required, Validators.min(0.01)]),
@@ -172,6 +180,7 @@ export class DoseCalculatorPage {
 
   constructor() {
     this.form.valueChanges.subscribe(() => this.formVersion.update((value) => value + 1));
+    this.route.queryParamMap.subscribe((params) => this.reuseHistoryEntry(params.get('reuse')));
   }
 
   clear(): void {
@@ -183,6 +192,9 @@ export class DoseCalculatorPage {
       concentration: null,
       concentrationUnit: null,
     });
+    this.submitted.set(false);
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   setPresentation(presentation: DoseInput['presentation']): void {
@@ -197,6 +209,8 @@ export class DoseCalculatorPage {
   }
 
   async save(): Promise<void> {
+    this.submitted.set(true);
+    this.form.markAllAsTouched();
     const result = this.result();
 
     if (!result) {
@@ -216,6 +230,31 @@ export class DoseCalculatorPage {
     } catch {
       await this.presentToast('No se pudo guardar el registro.', 'danger');
     }
+  }
+
+  fieldError(field: keyof DoseInput): string | null {
+    const control = this.form.controls[field];
+    if (!control || (!control.touched && !this.submitted())) {
+      return null;
+    }
+    return validateDoseInput(this.form.getRawValue()).find((issue) => issue.field === field)?.message ?? null;
+  }
+
+  private reuseHistoryEntry(id: string | null): void {
+    if (!id) return;
+    const entry = this.history.find(id);
+    if (entry?.kind === 'dose') {
+      this.form.patchValue({
+        ...entry.input,
+        patientWeightKg: Number(entry.input.patientWeightKg),
+        dosePerKg: Number(entry.input.dosePerKg),
+        concentration: entry.input.concentration == null ? null : Number(entry.input.concentration),
+      });
+      this.form.markAsPristine();
+      this.form.markAsUntouched();
+      this.submitted.set(false);
+    }
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { reuse: null }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   private async presentToast(message: string, color: 'success' | 'danger'): Promise<void> {

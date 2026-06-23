@@ -21,7 +21,7 @@ import { BottomNavComponent } from '../../../shared/components/bottom-nav.compon
             <ion-icon name="medical-outline" aria-hidden="true" />
           </div>
           <h1>FarmaDosis</h1>
-          <p>Version 1.0.0 · FarmaDosis</p>
+          <p>Version 1.1.0 · FarmaDosis</p>
         </div>
 
         <article class="info-card">

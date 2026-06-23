@@ -7,7 +7,7 @@ export interface CriInput {
   vialConcentrationMgMl: number | string;
   bagVolumeMl: number | string;
   bagCount: number | string;
-  infusionRateMlHour: number | string;
+  bagDurationHours: number | string;
 }
 
 export interface CriResult {

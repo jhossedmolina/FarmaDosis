@@ -9,7 +9,7 @@ describe('cri calculator', () => {
     vialConcentrationMgMl: 10,
     bagVolumeMl: 500,
     bagCount: 5,
-    infusionRateMlHour: 50,
+    bagDurationHours: 10,
   };
 
   it('calculates CRI step results', () => {
@@ -45,7 +45,7 @@ describe('cri calculator', () => {
       vialConcentrationMgMl: '10',
       bagVolumeMl: '500',
       bagCount: '5',
-      infusionRateMlHour: '50',
+      bagDurationHours: '10',
     });
 
     expect(result?.medicationVolumeMl).toBe(3);
@@ -55,11 +55,11 @@ describe('cri calculator', () => {
     const issues = validateCriInput({
       ...baseInput,
       bagVolumeMl: 0,
-      infusionRateMlHour: -1,
+      bagDurationHours: -1,
     });
 
     expect(issues.map((issue) => issue.field)).toContain('bagVolumeMl');
-    expect(issues.map((issue) => issue.field)).toContain('infusionRateMlHour');
+    expect(issues.map((issue) => issue.field)).toContain('bagDurationHours');
     expect(calculateCri({ ...baseInput, vialConcentrationMgMl: 0 })).toBeNull();
   });
 

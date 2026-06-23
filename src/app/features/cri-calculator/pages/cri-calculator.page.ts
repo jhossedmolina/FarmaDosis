@@ -1,6 +1,7 @@
 import { DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   IonBackButton,
   IonButton,
@@ -18,7 +19,7 @@ import {
   ToastController,
 } from '@ionic/angular/standalone';
 
-import { calculateCri } from '../../../domain/cri/cri-calculator';
+import { calculateCri, validateCriInput } from '../../../domain/cri/cri-calculator';
 import { CriInput } from '../../../domain/cri/cri.models';
 import { BottomNavComponent } from '../../../shared/components/bottom-nav.component';
 import { CalculatorTabsComponent } from '../../../shared/components/calculator-tabs.component';
@@ -87,6 +88,7 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
             <ion-item>
               <ion-input data-testid="cri-weight" label="Peso del paciente (kg)" labelPlacement="stacked" type="number" inputmode="decimal" formControlName="patientWeightKg" />
             </ion-item>
+            @if (fieldError('patientWeightKg'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
             <div class="inline-field">
               <ion-item>
                 <ion-input data-testid="cri-dose-rate" label="Dosis" labelPlacement="stacked" type="number" inputmode="decimal" formControlName="doseRate" />
@@ -99,18 +101,23 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
                 </ion-select>
               </ion-item>
             </div>
+            @if (fieldError('doseRate'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
             <ion-item>
               <ion-input data-testid="cri-bag-volume" label="Volumen del suero (ml)" labelPlacement="stacked" type="number" inputmode="decimal" formControlName="bagVolumeMl" />
             </ion-item>
+            @if (fieldError('bagVolumeMl'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
             <ion-item>
-              <ion-input data-testid="cri-infusion-rate" label="Velocidad de bomba (ml/h)" labelPlacement="stacked" type="number" inputmode="decimal" formControlName="infusionRateMlHour" />
+              <ion-input data-testid="cri-bag-duration" label="Duracion por bolsa (h)" labelPlacement="stacked" type="number" inputmode="decimal" formControlName="bagDurationHours" />
             </ion-item>
+            @if (fieldError('bagDurationHours'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
             <ion-item>
               <ion-input data-testid="cri-vial-concentration" label="Concentracion farmaco (mg/ml)" labelPlacement="stacked" type="number" inputmode="decimal" formControlName="vialConcentrationMgMl" />
             </ion-item>
+            @if (fieldError('vialConcentrationMgMl'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
             <ion-item>
               <ion-input data-testid="cri-bag-count" label="Num. de bolsas" labelPlacement="stacked" type="number" inputmode="numeric" formControlName="bagCount" />
             </ion-item>
+            @if (fieldError('bagCount'); as message) { <ion-note color="danger" role="alert">{{ message }}</ion-note> }
           </form>
 
           @if (result(); as criResult) {
@@ -123,6 +130,10 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
               <div class="step-card green">
                 <span>B · Duracion por bolsa</span>
                 <strong>{{ criResult.bagDurationHours }} <small>h</small></strong>
+              </div>
+              <div class="step-card blue">
+                <span>Flujo calculado</span>
+                <strong>{{ criResult.infusionRateMlHour }} <small>ml/h</small></strong>
               </div>
               <div class="step-card amber">
                 <span>C · Farmaco total por bolsa</span>
@@ -161,7 +172,7 @@ import { HistoryStoreService } from '../../history/services/history-store.servic
 
             <section class="follow-card">
               <strong>Plan de seguimiento:</strong>
-              <p>Check cada {{ criResult.bagDurationHours }} h. Finaliza despues de {{ form.controls.bagCount.value }} bolsas.</p>
+              <p>Cambie la bolsa cada {{ criResult.bagDurationHours }} h. Duracion total: {{ criResult.totalTreatmentDurationHours }} h.</p>
               <ion-note>Verifique dosis, unidades y velocidad de infusion antes de administrar.</ion-note>
               <ion-button data-testid="save-cri" expand="block" (click)="save()">Guardar en historial</ion-button>
             </section>
@@ -183,6 +194,9 @@ export class CriCalculatorPage {
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly history = inject(HistoryStoreService);
   private readonly toastController = inject(ToastController);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly submitted = signal(false);
 
   readonly form = this.fb.group({
     medicationName: this.fb.control<string>(''),
@@ -194,7 +208,7 @@ export class CriCalculatorPage {
     vialConcentrationMgMl: this.fb.control<number>(0, [Validators.required, Validators.min(0.01)]),
     bagVolumeMl: this.fb.control<number>(0, [Validators.required, Validators.min(0.01)]),
     bagCount: this.fb.control<number>(1, [Validators.required, Validators.min(1)]),
-    infusionRateMlHour: this.fb.control<number>(0, [Validators.required, Validators.min(0.01)]),
+    bagDurationHours: this.fb.control<number>(0, [Validators.required, Validators.min(0.01)]),
   });
 
   private readonly formVersion = signal(0);
@@ -206,6 +220,7 @@ export class CriCalculatorPage {
 
   constructor() {
     this.form.valueChanges.subscribe(() => this.formVersion.update((value) => value + 1));
+    this.route.queryParamMap.subscribe((params) => this.reuseHistoryEntry(params.get('reuse')));
   }
 
   clear(): void {
@@ -219,11 +234,16 @@ export class CriCalculatorPage {
       vialConcentrationMgMl: 0,
       bagVolumeMl: 0,
       bagCount: 1,
-      infusionRateMlHour: 0,
+      bagDurationHours: 0,
     });
+    this.submitted.set(false);
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   async save(): Promise<void> {
+    this.submitted.set(true);
+    this.form.markAllAsTouched();
     const result = this.result();
 
     if (!result) {
@@ -243,6 +263,34 @@ export class CriCalculatorPage {
     } catch {
       await this.presentToast('No se pudo guardar el registro.', 'danger');
     }
+  }
+
+  fieldError(field: keyof CriInput): string | null {
+    const control = this.form.controls[field];
+    if (!control || (!control.touched && !this.submitted())) {
+      return null;
+    }
+    return validateCriInput(this.form.getRawValue()).find((issue) => issue.field === field)?.message ?? null;
+  }
+
+  private reuseHistoryEntry(id: string | null): void {
+    if (!id) return;
+    const entry = this.history.find(id);
+    if (entry?.kind === 'cri') {
+      this.form.patchValue({
+        ...entry.input,
+        patientWeightKg: Number(entry.input.patientWeightKg),
+        doseRate: Number(entry.input.doseRate),
+        vialConcentrationMgMl: Number(entry.input.vialConcentrationMgMl),
+        bagVolumeMl: Number(entry.input.bagVolumeMl),
+        bagCount: Number(entry.input.bagCount),
+        bagDurationHours: Number(entry.input.bagDurationHours),
+      });
+      this.form.markAsPristine();
+      this.form.markAsUntouched();
+      this.submitted.set(false);
+    }
+    void this.router.navigate([], { relativeTo: this.route, queryParams: { reuse: null }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   private async presentToast(message: string, color: 'success' | 'danger'): Promise<void> {

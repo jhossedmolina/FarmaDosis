@@ -1,10 +1,12 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 
 import { HistoryEntry } from '../../../domain/history/history.models';
+import { HistoryStorageService } from '../../../infrastructure/storage/history-storage.service';
 
 @Injectable({ providedIn: 'root' })
 export class HistoryStoreService {
-  private readonly entriesSignal = signal<HistoryEntry[]>([]);
+  private readonly storage = inject(HistoryStorageService);
+  private readonly entriesSignal = signal<HistoryEntry[]>(this.storage.load());
 
   readonly entries = this.entriesSignal.asReadonly();
   readonly hasEntries = computed(() => this.entriesSignal().length > 0);
@@ -16,7 +18,7 @@ export class HistoryStoreService {
       createdAt: new Date().toISOString(),
     } as HistoryEntry;
 
-    this.entriesSignal.update((entries) => [nextEntry, ...entries].slice(0, 20));
+    this.updateEntries((entries) => [nextEntry, ...entries].slice(0, 20));
 
     return nextEntry;
   }
@@ -28,7 +30,7 @@ export class HistoryStoreService {
       return false;
     }
 
-    this.entriesSignal.update((entries) => entries.filter((entry) => entry.id !== id));
+    this.updateEntries((entries) => entries.filter((entry) => entry.id !== id));
 
     return true;
   }
@@ -43,5 +45,11 @@ export class HistoryStoreService {
     }
 
     return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  private updateEntries(update: (entries: HistoryEntry[]) => HistoryEntry[]): void {
+    const nextEntries = update(this.entriesSignal());
+    this.storage.save(nextEntries);
+    this.entriesSignal.set(nextEntries);
   }
 }

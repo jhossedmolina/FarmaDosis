@@ -15,12 +15,13 @@ export function calculateCri(input: CriInput): CriResult | null {
   const vialConcentrationMgMl = toNumber(input.vialConcentrationMgMl);
   const bagVolumeMl = toNumber(input.bagVolumeMl);
   const bagCount = toNumber(input.bagCount);
-  const infusionRateInput = toNumber(input.infusionRateMlHour);
+  const bagDurationHoursInput = toNumber(input.bagDurationHours);
 
   const drugRequiredMgHour = roundToTwo(
     convertDoseRateToMgKgHour(doseRate, input.doseRateUnit) * patientWeightKg,
   );
-  const targetBagConcentrationMgMl = roundToTwo(drugRequiredMgHour / infusionRateInput);
+  const infusionRateMlHour = roundToTwo(bagVolumeMl / bagDurationHoursInput);
+  const targetBagConcentrationMgMl = roundToTwo(drugRequiredMgHour / infusionRateMlHour);
   const medicationVolumeMl = roundToTwo(
     (targetBagConcentrationMgMl * bagVolumeMl) / vialConcentrationMgMl,
   );
@@ -29,8 +30,7 @@ export function calculateCri(input: CriInput): CriResult | null {
     return null;
   }
 
-  const infusionRateMlHour = roundToTwo(infusionRateInput);
-  const bagDurationHours = roundToTwo(bagVolumeMl / infusionRateInput);
+  const bagDurationHours = roundToTwo(bagDurationHoursInput);
   const totalTreatmentDurationHours = roundToTwo(bagDurationHours * bagCount);
 
   return {
@@ -43,7 +43,8 @@ export function calculateCri(input: CriInput): CriResult | null {
     totalTreatmentDurationHours,
     instruction:
       `Anadir ${medicationVolumeMl} ml del medicamento a la bolsa y retirar ` +
-      `${medicationVolumeMl} ml de suero. Administrar a ${infusionRateMlHour} ml/h.`,
+      `${medicationVolumeMl} ml de suero. Administrar a ${infusionRateMlHour} ml/h ` +
+      `durante ${totalTreatmentDurationHours} h en total.`,
     warnings: [PROFESSIONAL_USE_WARNING, CRI_UNIT_WARNING],
   };
 }
@@ -56,7 +57,7 @@ export function validateCriInput(input: CriInput): readonly CriValidationIssue[]
     'vialConcentrationMgMl',
     'bagVolumeMl',
     'bagCount',
-    'infusionRateMlHour',
+    'bagDurationHours',
   ];
 
   for (const field of fields) {
